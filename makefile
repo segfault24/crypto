@@ -1,23 +1,16 @@
+#!/bin.bash
+
 CC=gcc
-CFLAGS=-c -Wall
+CFLAGS=-c -Wall -Werror -Wextra -g
+LDFLAGS=
 
-all: main.out
+all: mymd5.out mysha256.out freq.out sep.out caesar.out vigenere.out
 
-main.out: main.o mycrypt.o mymd5.o mysha256.o
-	gcc main.o mycrypt.o mymd5.o mysha256.o -o main.out
+%.out: %.o
+	$(CC) $(LDFLAGS) $< -o $@
 
-main.o: main.c
-	$(CC) $(CFLAGS) main.c
-
-mymd5.o: mymd5.c
-	$(CC) $(CFLAGS) mymd5.c
-
-mysha256.o: mysha256.c
-	$(CC) $(CFLAGS) mysha256.c
-
-mycrypt.o: mycrypt.c
-	$(CC) $(CFLAGS) mycrypt.c
+%.o: %.c
+	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm -f main.out *.o *~
-
+	rm -f *.o *.out
