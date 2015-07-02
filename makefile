@@ -4,7 +4,7 @@ CC=gcc
 CFLAGS=-c -Wall -Werror -Wextra -g
 LDFLAGS=
 
-all: mymd5.out mysha256.out freq.out sep.out caesar.out vigenere.out
+all: mymd5.out mysha.out freq.out sep.out caesar.out vigenere.out
 
 %.out: %.o
 	$(CC) $(LDFLAGS) $< -o $@
