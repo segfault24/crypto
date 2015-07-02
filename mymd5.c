@@ -11,22 +11,22 @@
 
 #define FF(a, b, c, d, k, s, i) {\
 (a) = ((a)+F((b),(c),(d))+X[(k)]+T[(i)]);\
-(a) = ROTL((a),(s));\
+(a) = ROTL32((a),(s));\
 (a) = (a)+(b);\
 }
 #define GG(a, b, c, d, k, s, i) {\
 (a) = ((a)+G((b),(c),(d))+X[(k)]+T[(i)]);\
-(a) = ROTL((a),(s));\
+(a) = ROTL32((a),(s));\
 (a) = (a)+(b);\
 }
 #define HH(a, b, c, d, k, s, i) {\
 (a) = ((a)+H((b),(c),(d))+X[(k)]+T[(i)]);\
-(a) = ROTL((a),(s));\
+(a) = ROTL32((a),(s));\
 (a) = (a)+(b);\
 }
 #define II(a, b, c, d, k, s, i) {\
 (a) = ((a)+I((b),(c),(d))+X[(k)]+T[(i)]);\
-(a) = ROTL((a),(s));\
+(a) = ROTL32((a),(s));\
 (a) = (a)+(b);\
 }
 
