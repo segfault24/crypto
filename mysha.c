@@ -1,5 +1,5 @@
-/* 
- * 
+/* This an implementation of the Secure Hash Algorithm
+ * for the 224, 256, 384, and 512 bit variants.
  */
 
 #include <stdlib.h>
@@ -95,12 +95,12 @@ int sha_256_224(char* filename, int mode, uint32_t* hash_output)
 	
 	uint64_t total_len; // total length of message in bytes
 	uint32_t read_len; // number of bytes from file to current block
-
+	
 	uint32_t H[8]; // working hash value
 	uint32_t W[64]; // message schedule
 	uint32_t a, b, c, d, e, f, g, h; // working variables
 	uint32_t T_1, T_2; // temporary variables
-
+	
 	// first things first, open the file
 	file = fopen(filename, "r");
 	if(!file)
@@ -231,7 +231,7 @@ int sha_256_224(char* filename, int mode, uint32_t* hash_output)
 		H[6] += g;
 		H[7] += h;
 	}
-
+	
 	// copy the result into the caller's array
 	memcpy(hash_output, &H, 32);
 	
@@ -246,12 +246,12 @@ int sha_512_384(char* filename, int mode, uint64_t* hash_output)
 	
 	uint128_t total_len; // total length of message in bytes
 	uint64_t read_len; // number of bytes from file to current block
-
+	
 	uint64_t H[8]; // working hash value
 	uint64_t W[80]; // message schedule
 	uint64_t a, b, c, d, e, f, g, h; // working variables
 	uint64_t T_1, T_2; // temporary variables
-
+	
 	// first things first, open the file
 	file = fopen(filename, "r");
 	if(!file)
@@ -364,7 +364,7 @@ int sha_512_384(char* filename, int mode, uint64_t* hash_output)
 		f = H[5];
 		g = H[6];
 		h = H[7];
-
+		
 		// primary computation loop
 		for(j=0; j<80; j++)
 		{
@@ -390,7 +390,7 @@ int sha_512_384(char* filename, int mode, uint64_t* hash_output)
 		H[6] += g;
 		H[7] += h;
 	}
-
+	
 	// copy the result into the caller's array
 	memcpy(hash_output, &H, 64);
 	
