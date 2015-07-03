@@ -9,7 +9,7 @@
 #include "mycrypt.h"
 
 // thank you GCC
-#define uint128_t unsigned __int128
+#define uint128_t __uint128_t
 
 // for internal purposes
 #define MODE_224		224
@@ -111,11 +111,11 @@ int sha_256_224(char* filename, int mode, uint32_t* hash_output)
 	// setup initial hash values
 	if(mode == MODE_224)
 	{
-		memcpy(&H, H224, 32);
+		memcpy(&H, &H224, 32);
 	}
 	else
 	{
-		memcpy(&H, H256, 32);
+		memcpy(&H, &H256, 32);
 	}
 	
 	// data blocks are 16 words (aka 64 bytes or 512 bits)
@@ -130,7 +130,7 @@ int sha_256_224(char* filename, int mode, uint32_t* hash_output)
 		// processing for the special cases of the last block(s) so that the
 		// additional '1' bit and total bit length are appended in the correct
 		// places independently of the main processing sections.
-		memset(W, 0, 64);
+		memset(W, 0, 256);
 		if(special)
 		{
 			// This is the special case where the previous block was the end of
@@ -248,7 +248,7 @@ int sha_512_384(char* filename, int mode, uint64_t* hash_output)
 	uint64_t read_len; // number of bytes from file to current block
 
 	uint64_t H[8]; // working hash value
-	uint64_t W[64]; // message schedule
+	uint64_t W[80]; // message schedule
 	uint64_t a, b, c, d, e, f, g, h; // working variables
 	uint64_t T_1, T_2; // temporary variables
 
@@ -260,27 +260,14 @@ int sha_512_384(char* filename, int mode, uint64_t* hash_output)
 	}
 	
 	// setup initial hash values
-	for(j=0; j<8; j++)
+	if(mode == MODE_384)
 	{
-		if(mode == MODE_384)
-		{
-			H[j] = H384[j];
-		}
-		else
-		{
-			H[j] = H512[j];
-		}
+		memcpy(&H, &H384, 64);
 	}
-	
-	//////////////////////////
-	//////////////////////////
-	for(j=0; j<8; j++)
+	else
 	{
-		printf("H[%u] = %08x%08x\n", (uint32_t)j, (uint32_t)(H[j]>>32), (uint32_t)H[j]);
+		memcpy(&H, &H512, 64);
 	}
-	printf("\n");
-	///////////////////////////
-	///////////////////////////
 	
 	// data blocks are 32 words (aka 128 bytes or 1024 bits)
 	total_len = 0;
@@ -294,7 +281,7 @@ int sha_512_384(char* filename, int mode, uint64_t* hash_output)
 		// processing for the special cases of the last block(s) so that the
 		// additional '1' bit and total bit length are appended in the correct
 		// places independently of the main processing sections.
-		memset(W, 0, 128);
+		memset(W, 0, 640);
 		if(special)
 		{
 			// This is the special case where the previous block was the end of
@@ -353,22 +340,12 @@ int sha_512_384(char* filename, int mode, uint64_t* hash_output)
 			((char*)W)[126] = (total_len >> 5)&0xff;
 			((char*)W)[127] = (total_len << 3)&0xff;
 		}
-	
+		
 		// endian swap all the words
 		for(j=0; j<32; j++)
 		{
 			W[j] = ENDIANSWAP64(W[j]);
 		}
-		
-		////////////////////////
-		////////////////////////
-		for(j=0;j<16;j++)
-		{
-			printf("W[%u] = %08x%08x\n", (uint32_t)j, (uint32_t)(W[j]>>32), (uint32_t)W[j]);
-		}
-		printf("\n");
-		////////////////////////
-		////////////////////////
 		
 		// below here is the main body of the SHA processing
 		
@@ -387,32 +364,10 @@ int sha_512_384(char* filename, int mode, uint64_t* hash_output)
 		f = H[5];
 		g = H[6];
 		h = H[7];
-		
+
 		// primary computation loop
 		for(j=0; j<80; j++)
 		{
-			///////////////////////////
-			///////////////////////////
-			if(j<4)
-			{
-				printf("t=%02d:  %08x%08x %08x%08x %08x%08x %08x%08x\n",
-					(uint32_t)j,
-					(uint32_t)a, (uint32_t)(a>>32),
-					(uint32_t)b, (uint32_t)(b>>32),
-					(uint32_t)c, (uint32_t)(c>>32),
-					(uint32_t)d, (uint32_t)(d>>32)
-				);
-				printf("       %08x%08x %08x%08x %08x%08x %08x%08x\n",
-					(uint32_t)e, (uint32_t)(e>>32),
-					(uint32_t)f, (uint32_t)(f>>32),
-					(uint32_t)g, (uint32_t)(g>>32),
-					(uint32_t)h, (uint32_t)(h>>32)
-				);
-				printf("\n");
-			}
-			///////////////////////////
-			///////////////////////////
-			
 			T_1 = h + SIGMA_U3(e) + CH(e, f, g) + K512[j] + W[j];
 			T_2 = SIGMA_U2(a) + MAJ(a, b, c);
 			h = g;
@@ -505,7 +460,7 @@ int main(int argc, char *argv[])
 			for(j=0; j<8; j++) { printf("%08x", h1[j]); }
 			break;
 		case MODE_384:
-			for(j=0; j<7; j++) { printf("%08x%08x", (uint32_t)(h2[j]>>32), (uint32_t)h2[j]); }
+			for(j=0; j<6; j++) { printf("%08x%08x", (uint32_t)(h2[j]>>32), (uint32_t)h2[j]); }
 			break;
 		case MODE_512:
 			for(j=0; j<8; j++) { printf("%08x%08x", (uint32_t)(h2[j]>>32), (uint32_t)h2[j]); }
