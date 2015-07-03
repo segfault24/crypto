@@ -1,4 +1,4 @@
-#!/bin.bash
+#!/bin/bash
 
 CC=gcc
 CFLAGS=-c -Wall -Werror -Wextra -g
