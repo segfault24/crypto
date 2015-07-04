@@ -19,14 +19,15 @@ void print_usage()
 	printf("   -a   print all counts\n");
 	printf("   -b   print only bigram counts\n");
 	printf("   -c   print only character counts (default)\n");
-	printf("   -n   don't sort before printing\n");
+	printf("   -s   sort before printing\n");
+	printf("   -t   tr compatible output (implies -c -s -z)\n");
 	printf("   -z   print zero counts\n");
 	//TODO: printf("   -i   print natural frequencies info\n");
 }
 
 int main(int argc, char* argv[])
 {
-	int file_arg, flag_sort, flag_single, flag_bigram, flag_zeroes;
+	int file_arg, flag_sort, flag_single, flag_bigram, flag_zeroes, flag_tr;
 	
 	FILE *file;
 	int i, j, t_i, t_c;
@@ -36,10 +37,11 @@ int main(int argc, char* argv[])
 	
 	// default behaviors
 	file_arg = -1;
-	flag_sort = 1;
+	flag_sort = 0;
 	flag_single = 0;
 	flag_bigram = 0;
 	flag_zeroes = 0;
+	flag_tr = 0;
 	
 	// parse each command line argument
 	for(i=1; i<argc; i++)
@@ -65,8 +67,11 @@ int main(int argc, char* argv[])
 					case 'c':
 						flag_single = 1;
 						break;
-					case 'n':
-						flag_sort = 0;
+					case 's':
+						flag_sort = 1;
+						break;
+					case 't':
+						flag_tr = 1;
 						break;
 					case 'z':
 						flag_zeroes = 1;
@@ -88,6 +93,13 @@ int main(int argc, char* argv[])
 	if(!flag_single && !flag_bigram)
 	{
 		flag_single = 1;
+	}
+	if(flag_tr)
+	{
+		flag_sort = 1;
+		flag_single = 1;
+		flag_bigram = 0;
+		flag_zeroes = 1;
 	}
 	
 	// initialize the counter arrays
@@ -198,6 +210,7 @@ int main(int argc, char* argv[])
 		{
 			if(ccount[i][1]!=0 || flag_zeroes)
 			{
+				if(flag_tr) { printf("%c", ccount[i][0]); continue; }
 				printf("%c:%u\n", ccount[i][0], ccount[i][1]);
 			}
 		}
